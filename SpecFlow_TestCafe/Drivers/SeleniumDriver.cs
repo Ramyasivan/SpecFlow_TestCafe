@@ -10,15 +10,14 @@ namespace SpecFlow_TestCafe.Drivers
     public class SeleniumDriver
     {
         private IWebDriver driver;
-        private readonly ScenarioContext _scenarioContext;
 
-        public SeleniumDriver(ScenarioContext scenarioContext) => _scenarioContext = scenarioContext;
 
         public IWebDriver Setup()
         {
-            driver = new ChromeDriver();
-            _scenarioContext.Set(driver, "webdriver");
-            driver.Manage().Window.Maximize();
+            ChromeOptions options = new ChromeOptions();
+            options.AddArguments("'--start-maximized'");
+            driver = new ChromeDriver(options);
+            driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(5);
             return driver;
         }
     }
