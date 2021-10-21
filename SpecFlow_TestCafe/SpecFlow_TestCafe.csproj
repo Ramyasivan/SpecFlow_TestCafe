@@ -20,6 +20,10 @@
 
   <ItemGroup>
     <Folder Include="TestResult\" />
+    <Folder Include=".circleci\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".circleci\config.yml" />
+  </ItemGroup>
 </Project>
