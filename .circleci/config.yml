@@ -1,0 +1,60 @@
+version: 2.1
+
+orbs:
+  win: circleci/windows@2.4.0
+  browser-tools: circleci/browser-tools@1.2.3
+
+workflows:
+  SpecFlow_TestCafe:
+    jobs:
+      - build
+  BDD-tests:
+    jobs:
+      - ui-tests
+
+jobs:
+  build:
+    executor:
+      name: win/default
+    working_directory: C:\Users\circleci\project\Test_CircleCI\SpecFlow_TestCafe
+    steps:
+      - checkout:
+          path: C:\Users\circleci\project\Test_CircleCI
+      - restore_cache:
+          keys:
+            - dotnet-packages-v1-{{ checksum "SpecFlow_TestCafe.csproj" }}
+      - run:
+          name: "Install project dependencies"
+          command: dotnet.exe restore
+      - save_cache:
+          paths:
+            - C:\Users\circleci\project\Test_CircleCI\SpecFlow_TestCafe\.nuget\packages
+          key: dotnet-packages-v1-{{ checksum "SpecFlow_TestCafe.csproj" }}
+      - run:
+          name: "Run Build step"
+          command: dotnet.exe publish -c Release -r win10-x64
+
+  ui-tests:
+    executor:
+      name: win/default
+      shell: powershell.exe
+    steps:
+      - checkout
+
+      - run:
+          name: install chrome browser
+          command: |
+           choco install googlechrome
+
+      - run:
+          name: Restore and build
+          command: |
+            cd Test_CircleCI\SpecFlow_TestCafe
+            nuget restore
+            cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\msbuild\current\bin\"
+            .\msbuild.exe "C:\Users\circleci\project\SpecFlow_TestCafe\SpecFlow_TestCafe.csproj"
+      - run: 
+          name: Run UI tests
+          command: |
+              cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\common7\ide\extensions\TestPlatform"
+              .\vstest.console.exe C:\Users\circleci\project\SpecFlow_TestCafe\bin\Debug\netcoreapp3.1\SpecFlow_TestCafe.dll
