@@ -15,7 +15,8 @@ namespace SpecFlow_TestCafe.Drivers
         public IWebDriver Setup()
         {
             ChromeOptions options = new ChromeOptions();
-            options.AddArguments("'--start-maximized'");
+            options.AddArguments("--start-maximized");
+            options.AddArguments("--headless");
             driver = new ChromeDriver(options);
             driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(5);
             return driver;
